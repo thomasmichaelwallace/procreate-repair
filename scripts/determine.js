@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const DB_PATH = './resources/unknown/defs/db.JSON';
 const MAGIC_BYTES = './resources/unknown/magic.bytes.json';
-const MAGIC_LEN = 4;
+const MAGIC_LEN = 8;
 const OUT_FILE = './resources/unknown/magic.types.json';
 
 const db = JSON.parse(fs.readFileSync(DB_PATH));
@@ -36,4 +36,6 @@ Object.entries(bytes).forEach(([b, c]) => {
     determined.$unknown.push(b);
   }
 });
-fs.writeFileSync(OUT_FILE, JSON.stringify(determined, null, 2));
+const sorted = {};
+Object.keys(determined).sort().forEach((k) => { sorted[k] = determined[k]; });
+fs.writeFileSync(OUT_FILE, JSON.stringify(sorted, null, 2));

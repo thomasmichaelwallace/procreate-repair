@@ -17,7 +17,7 @@ const PARSER_OPTIONS = {
 
 const magic = { /* [up-to first four bytes]: names[] */ };
 
-const dirs = fs.readdirSync(DEFS_ROOT);
+const dirs = fs.readdirSync(DEFS_ROOT).filter((f) => !f.includes('.'));
 dirs.forEach((d) => {
   const files = fs.readdirSync(path.join(DEFS_ROOT, d)).map((f) => path.join(DEFS_ROOT, d, f));
   files.forEach((f) => {
@@ -25,8 +25,15 @@ dirs.forEach((d) => {
     const { TrID: [xml] } = parser.toJson(data, PARSER_OPTIONS);
 
     if (xml.Info.length > 1) throw new TypeError(`Too many Info nodes ${f}`);
-    const { Info: [{ FileType: fileType, Ext: ext }] } = xml;
-    const description = `${fileType} (${ext})`;
+    const { Info: [{ FileType: [fileType], Ext: extensions }] } = xml;
+
+    let description = fileType;
+    if (extensions) {
+      if (extensions.length > 1) throw new TypeError(`Too many Ext nodes: ${f}`);
+      if (typeof extensions[0] === 'string') {
+        description = `${description} (${extensions[0]})`;
+      }
+    }
 
     const { FrontBlock: [{ Pattern: patterns }] } = xml;
     const bytes = patterns.map((p) => p.Bytes[0]);
