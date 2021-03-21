@@ -19,11 +19,11 @@ def recover_range(
     if procreate.validate():
         print('validated procreate file')
         if not preview_mode:
-            procreate.write_file(os.path.join(out_dir, procreate.name + '.procreate'))
-            preview_name = procreate.name + '.preview.png'
+            name = procreate.name if procreate.name != '$null' else "unknown"
+            procreate.write_file(os.path.join(out_dir, name + '.procreate'))
         else:
             preview_name = str(start) + '.preview.png'
-        procreate.write_layer(procreate.composite_uuid, os.path.join(out_dir, preview_name))
+            procreate.write_layer(procreate.composite_uuid, os.path.join(out_dir, preview_name))
     else:
         print('skipping invalid drawing')
 
@@ -52,6 +52,6 @@ def recover_range_file(filename: str, chk_dirname: str, out_dir: str, preview_mo
     for range_json in range_file:
         if range_json['valid'] is True:
             ranges.append([range_json['start'], range_json['end']])
-    ranges = [ranges[-1]]
+    # ranges = [ranges[-1]] # debugging
     print('discovered ' + str(len(ranges)) + ' files')
     recover_ranges(chk_dirname, ranges, out_dir, preview_mode)
